@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>computed</title>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+</head>
+<body>
+<div id="app">
+  <p><label>First Name: <input type="text" v-model="firstName" /></label></p>
+  <p><label>Last Name: <input type="text" v-model="lastName" /></label></p>
+  <p>[Method] Hello {{getInitial()}}!</p>
+  <p>[Computed] Hello {{initial}}!</p>
+</div>
+<script>
+var app = new Vue({
+  el: "#app",
+  data: {
+    firstName: "",
+    lastName: "",
+  },
+  computed: {
+    initial: function(){
+      return this._getInitialOf(this.firstName) + "." + this._getInitialOf(this.lastName) + ".";
+    }
+  },
+  methods: {
+    getInitial: function(){
+      return this._getInitialOf(this.firstName) + "." + this._getInitialOf(this.lastName) + ".";
+    },
+    _getInitialOf: function(str){
+      return str.charAt(0).toUpperCase();
+    }
+  }
+})
+</script>
+
+<div id="app2">
+  <my-clock :now="now"></my-clock>
+  <hr />
+  <ul>
+    <user-item v-for="user in users" :user="user"></user-item>
+  </ul>
+</div>
+<script>
+var app2 = new Vue({
+  el: "#app2",
+  components: {
+    // 時計コンポーネント
+    myClock: {
+      template: '<p>{{readable}}</p>',
+      props: [
+        "now"
+      ],
+      computed: {
+        readable: function(){
+          var string = ("0" + this.now.getHours()).slice(-2)
+                     + ":"
+                     + ("0" + this.now.getMinutes()).slice(-2)
+                     + ":"
+                     + ("0" + this.now.getSeconds()).slice(-2);
+          return string;
+        }
+      }
+    },
+    // ユーザーリストコンポーネント
+    userItem: {
+      template: '<li>{{initial}}</li>',
+      props: [
+        "user"
+      ],
+      computed: {
+        initial: function(){
+          return this._getInitialOf(this.user.firstName) + "." + this._getInitialOf(this.user.lastName) + ".";
+        }
+      },
+      methods: {
+        _getInitialOf: function(str){
+          return str.charAt(0).toUpperCase();
+        }
+      }
+    }
+  },
+  data: {
+    now: null,
+    users: [
+      {firstName: "aaa", lastName: "bbb"},
+      {firstName: "ccc", lastName: "ddd"},
+      {firstName: "eee", lastName: "fff"}
+    ]
+  },
+  computed: {
+
+  },
+  methods: {
+
+  },
+  created: function(){
+    this.now = new Date();
+    setInterval((function(){
+      this.now = new Date();
+    }).bind(this),1000);
+  }
+})
+</script>
+
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>基本文法</title>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+</head>
+<body>
+<div id="app1">
+  <h1>シンプルなdataの使い方</h1>
+  <p>(data) {{message1 + message2}}</p>
+  <hr />
+  <h1>computed</h1>
+  <p>(computed) {{fullName}}</p>
+  <hr />
+  <h1>v-on:click</h1>
+  <p v-on:click="hello_click">Hello Click!</p>
+  <hr />
+  <h1>コンポーネント</h1>
+  <p><compo v-bind:title="'コンポーネントタイトル'"></compo><compo v-bind:title="lastName"></compo></p>
+  <hr />
+  <h1>watch</h1>
+  <p>(watch Vue.set(vm, "lastName", 123); とやるとwatchメソッドが発火します)</p>
+  <hr />
+  <h1>HTML出力</h1>
+  <p>ただのmessageなら{{message}}される <br /> v-html=messageなら<span v-html="message"></span>されない</p>
+  <hr />
+  <h1>v-showで表示非表示</h1>
+  <p v-show="isVisible">Vue.set(vm, "isVisible", false)で非表示</p>
+  <hr />
+  <h1>v-if, v-else-if v-else</h1>
+  <select v-model="language">
+    <option value="en">en</option>
+    <option value="ja">ja</option>
+    <option value="other">other</option>
+  </select>
+  <div v-if="language==='en'">
+    <p>language en</p>
+  </div>
+  <div v-else-if="language==='ja'">
+    <p>日本語</p>
+  </div>
+  <div v-else>
+    <p>それ以外</p>
+  </div>
+  <hr />
+  <h1>List</h1>
+  <ul>
+    <li v-for="name in names">{{name}}</li>
+  </ul>
+  <ul>
+    <li v-for="i in 3">{{i}}</li>
+  </ul>
+  <ul>
+    <li v-for="(v,k) in obj">{{k}} : {{v}}</li>
+  </ul>
+  <hr />
+  <form v-on:submit.prevent="form_submit">
+    <input type="text" value="" name="dummy_name" />
+    <input type="submit" />
+  </form>
+  <hr />
+  <h1>form v-model</h1>
+  <p>{{form_message}}, {{form_available}}, {{form_number}}</p>
+  <input type="text" v-model="form_message" />
+  <input type="checkbox" v-model="form_available" />
+  <input type="number" v-model="form_number" />
+</div>
+<script>
+var vm = new Vue({
+  //el: "#app1"
+  //または
+  el: document.getElementById("app1"),
+  // data
+  data: {
+    message1: "コンストラクタ―",
+    message2: "です。",
+    firstName: "ファーストネーム",
+    lastName: "ラストネーム",
+
+    // これは{{}}だとエスケープされる　
+    message: '<strong>エスケープ</strong>',
+
+    // v-showをつかった表示非表示 Vue.set(vm, "isVisible", false)で非表示
+    isVisible: true,
+
+    // v-if v-else-if v-else
+    language: "ja",
+
+    // v-for
+    names: ['a','b','c'],
+    obj: {a:1, b:2, c:3},
+
+    // form v-model
+    form_message: "init_message",
+    form_number: 0,
+    form_available: true
+  },
+  // computedで動的情報 補足）lastNameを動的にVue.set(vm,"lastName", "hoge")にしても追従してくれる
+  computed: {
+    fullName: function(){
+      return this.firstName + " " + this.lastName;
+    }
+  },
+  // methodsでイベント処理
+  methods: {
+    hello_click: function(e){
+      console.log(e);
+    },
+    form_submit: function(e){
+      // e.preventDefaultは不要。form.preventで十分。
+    }
+  },
+  // components
+  components: {
+    "compo": {
+      template: '<span>{{title}}　</span>',
+      props: ['title']
+    }
+  },
+  // watch 補足）https://jp.vuejs.org/v2/guide/computed.html#算出プロパティ-vs-監視プロパティ
+  watch: {
+    lastName: function(val){
+      // computedでは難しい、コールバック処理なんかはここでやる
+      console.log("watch", val)
+    }
+  }
+})
+</script>
+
+
+
+</body>
+</html>

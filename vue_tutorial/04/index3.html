@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>todo - 一覧をVue化</title>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css" integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+<style>
+.taskListOperator {
+    text-align: right;
+    margin-bottom: 1em;
+}
+</style>
+</head>
+<body>
+<div id="app">
+<div class="container">
+<h1>Vue Todo</h1>
+
+<div class="inputArea">
+<task-form></task-form>
+<!-- inputArea --></div>
+
+<hr />
+
+<div class="taskListOperator">
+<button class="btn btn-default">Delete</button>
+<!-- taskListOperator --></div>
+
+<div class="list-group">
+<label v-for="task in tasks" class="list-group-item">
+<input type="checkbox" /> {{task.name}}
+</label>
+<!-- list-group --></div>
+
+<!-- container --></div>
+<!-- app --></div>
+
+<!-- ================================= template html ================================= -->
+<script type="text/x-template" id="template-task-form">
+<form>
+<div class="input-group">
+<input class="form-control" type="text" placeholder="Buy milk 2L">
+<span class="input-group-btn">
+<button class="btn btn-primary">Add new task</button>
+</span>
+<!-- input-group --></div>
+</form>
+</script>
+<!-- ================================= /template html ================================= -->
+
+<script>
+// template定義
+var taskForm = {
+  template: "#template-task-form"
+}
+
+var app = new Vue({
+  el: "#app",
+  components: {
+    taskForm: taskForm
+  },
+  data: {
+    tasks: [
+      {name: "Buy milk 2L"},
+      {name: "Call to Alice"},
+      {name: "Return book"},
+    ]
+  },
+  computed: {
+
+  },
+  methods: {
+
+  }
+})
+</script>
+</body>
+</html>

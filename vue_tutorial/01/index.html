@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>vue hello world</title>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+</head>
+<body>
+  <p>もっともシンプルなVue.jsの使い方</p>
+  <div id="app">
+    <h1>{{message}}</h1>
+  </div>
+  <script type="text/javascript">
+  var app = new Vue({
+    el: "#app",
+    data: {
+      message: "Hello!"
+    }
+  });
+  </script>
+  <hr />
+
+  <p>globalにcomponentを作る</p>
+  <div id="app2">
+    <app-title v-bind:title="message1"></app-title>
+    <app-title v-bind:title="message2"></app-title>
+  </div>
+  <script type="text/javascript">
+  Vue.component('app-title', {
+    template: '<h1>{{title}}</h1>',
+    props: [
+      "title"
+    ]
+  });
+  var app2 = new Vue({
+    el: "#app2",
+    data: {
+      message1: "メッセージ１",
+      message2: "メッセージ２"
+    }
+  });
+  </script>
+  <hr />
+
+  <p>localなcomponentを作る</p>
+  <div id="app3">
+    <app-title v-bind:title="message1"></app-title>
+    <app-title2 v-bind:title="message2"></app-title>
+  </div>
+  <script type="text/javascript">
+  var app3 = new Vue({
+    el: "#app3",
+    data: {
+      message1: "グローバルcomponent使っている",
+      message2: "ローカルcomponent使っている"
+    },
+    components: {
+      "app-title2": {
+        template: '<h1>{{title}}</h1>',
+        props: [
+          "title"
+        ]
+      }
+    }
+  });
+  </script>
+  <hr />
+
+  <p>clickイベント</p>
+  <div id="app4">
+    <button v-on:click="edit_click">編集</button>
+    <app-title3 v-bind:title="message"></app-title>
+  </div>
+  <script type="text/javascript">
+  Vue.component('app-title3', {
+    template: '<h1>{{title}}</h1>',
+    props: [
+      'title'
+    ]
+  });
+  var app4 = new Vue({
+    el: "#app4",
+    data: {
+      message: "default message"
+    },
+    methods: {
+      edit_click: function(e){
+        var msg = window.prompt("入力してください", this.message);
+        //this.message = msg;
+        //本当はVue.set()のほうが良い？
+        Vue.set(app4, "message", msg);
+      }
+    }
+  });
+  </script>
+  <hr />
+
+  <p>配列のリスト表示、操作</p>
+  <div id="app5">
+    <button v-on:click="add_click">追加</button>
+    <button v-on:click="change_click">変更</button>
+    <ul>
+      <li v-for="num in numbers">{{num}}</li>
+    </ul>
+  </div>
+  <script type="text/javascript">
+  var app5 = new Vue({
+    el: "#app5",
+    data: {
+      numbers: [1,2,3,4,5]
+    },
+    methods: {
+      add_click: function(e){
+        var newNumber = Math.floor(Math.random() * 100);
+        //this.numbers.push(newNumber);
+        //Vue.setでもできる
+        Vue.set(this.numbers, this.numbers.length, newNumber);
+      },
+      change_click: function(e){
+        var index = Math.floor(Math.random() * this.numbers.length);
+        var newNumber = Math.floor(Math.random() * 100);
+
+        // 以下のようにやるとリストレンダリングが更新されない
+        //this.numbers[index] = newNumber;
+
+        // 再描画しつつ更新
+        Vue.set(this.numbers, index, newNumber);
+      }
+    }
+  })
+  </script>
+  <hr />
+
+  <p>コンポーネント間のやりとり(ginpen.comさんとは違ったやり方にした)</p>
+  <div id="app6">
+    <app-title v-bind:message1="parentVmMessage"></app-title>
+    <app-form v-model="parentVmMessage" v-on:submit-from-child="parentSubmit"></app-form>
+  </div>
+  <script type="text/javascript">
+  // 親コンポーネントのmodel値を表示する子コンポーネント
+  var appTitle = {
+    template: '<h1>{{message1}}</h1>',
+    props: ['message1']
+  }
+
+  // 親コンポーネントのmodel値を更新する子コンポーネント
+  var appForm = {
+    template: '<div>'+
+      '<input type="text" v-model="childMessage" v-on:input="text_input" />'+
+      '<button v-on:click="button_click">Update</button>'+
+    '</div>',
+    data: function(){
+      return {
+        childMessage: ""//parentVmMessageとは別に、子コンポーネント内でストアさせる変数は子コンポーネントのv-modelなどで保持可能
+      }
+    },
+    methods:{
+      button_click: function(e){
+        console.log("子コンポーネントでクリックイベントを検知",this.childMessage)
+        this.$emit('submit-from-child',this.childMessage);
+      },
+      text_input: function(e){
+        this.$emit('input',e.target.value);
+      }
+    }
+  }
+
+  // 親コンポーネント
+  var app6 = new Vue({
+    el: "#app6",
+    components: {
+      appTitle: appTitle,
+      appForm: appForm
+    },
+    data: {
+      parentVmMessage: ""//
+    },
+    methods: {
+      parentSubmit: function(v){
+        console.log("親コンポーネントのメソッド",this.parentVmMessage,v)
+        this.parentVmMessage = v;
+      }
+    }
+  })
+  </script>
+  <hr />
+
+  <p>表示非表示切り替え</p>
+  <div id="app7">
+    <button v-on:click="toggle_onClick">開閉</button>
+    <div v-show="isVisible">
+      <p>ああああああ</p>
+    </div>
+  </div>
+  <script type="text/javascript">
+    var app7 = new Vue({
+      el: "#app7",
+      data: {
+        isVisible: false,
+      },
+      methods: {
+        toggle_onClick: function(e){
+          this.isVisible = !this.isVisible;
+        }
+      }
+    })
+  </script>
+  <hr />
+
+  <p>animation</p>
+  <div id="app8">
+    <button v-on:click="toggle_onClick">開閉</button>
+    <transition>
+      <div v-show="isVisible" class="box">
+        <p>いいいいいいいい</p>
+        <p>ううううううううう</p>
+      </div>
+    </transition>
+  </div>
+  <script type="text/javascript">
+    var app8 = new Vue({
+      el: "#app8",
+      data: {
+        isVisible: false,
+      },
+      methods: {
+        toggle_onClick: function(e){
+          this.isVisible = !this.isVisible;
+        }
+      }
+    })
+  </script>
+  <style type="text/css">
+  .box {
+    background-color: black;
+    border: 1px solid #9cf;
+    transition: all 3s;
+  }
+  .v-enter {
+    opacity: 0;
+    background-color: blue;
+  }
+  .v-enter-active {
+    opacity: 1;
+    background-color: red;
+  }
+  .v-leave {
+    opacity: 1;
+    background-color: green;
+  }
+  .v-leave-active {
+    opacity: 0;
+    background-color: yellow;
+  }
+  </style>
+</body>
+</html>

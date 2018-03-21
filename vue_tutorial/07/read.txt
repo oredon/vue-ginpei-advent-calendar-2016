@@ -1,0 +1,1 @@
+browserifyではなくwebpackでやってみた。vuexの使用有無で２パターン作成。
